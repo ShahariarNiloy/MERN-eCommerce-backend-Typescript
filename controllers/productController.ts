@@ -76,36 +76,47 @@ export const updateProduct = async (
     res: Response,
     next: NextFunction
 ) => {
-    let product = await Product.findById(req.params.id)
+    try {
+        let product = await Product.findById(req.params.id)
 
-    if (!product) {
-        next(new ErrorHandler('Product not found', 404))
-        return
+        if (product === null) {
+            next(new ErrorHandler('Product not found', 404))
+            return
+        }
+
+        // Images Start Here
+        let images = []
+
+        if (typeof req.body.images === 'string') {
+            images.push(req.body.images)
+        } else {
+            images = req.body.images
+        }
+
+        if (images !== undefined) {
+            // req.body.images = imagesLinks;
+        }
+
+        product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+            useFindAndModify: false,
+        })
+
+        res.status(200).json({
+            success: true,
+            product,
+        })
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            return res
+                .status(500)
+                .json({ success: false, message: err.message })
+        }
+        return res
+            .status(500)
+            .json({ success: false, message: 'Something went wrong' })
     }
-
-    // Images Start Here
-    let images = []
-
-    if (typeof req.body.images === 'string') {
-        images.push(req.body.images)
-    } else {
-        images = req.body.images
-    }
-
-    if (images !== undefined) {
-        // req.body.images = imagesLinks;
-    }
-
-    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-        useFindAndModify: false,
-    })
-
-    res.status(200).json({
-        success: true,
-        product,
-    })
 }
 
 export const deleteProduct = async (
@@ -116,7 +127,7 @@ export const deleteProduct = async (
     try {
         const product = await Product.findById(req.params.id)
 
-        if (!product) {
+        if (product === null) {
             next(new ErrorHandler('Product not found', 404))
             return
         }
@@ -174,7 +185,7 @@ export const getProductReviews = async (
 ) => {
     const product = await Product.findById(req.query.id)
 
-    if (product == null) {
+    if (product === null) {
         next(new ErrorHandler('Product not found', 404))
         return
     }
@@ -199,8 +210,8 @@ export const deleteReview = async (
 
     const reviews = product.reviews.filter(
         (rev: (typeof product)['reviews'][number] & { _id?: ObjectId }) => {
-            if (rev._id != null) {
-                return rev._id.toString() !== req.query.id?.toString()
+            if (rev._id !== null && rev._id !== undefined) {
+                return JSON.stringify(rev._id) !== req.query.id?.toString()
             }
             return false
         }
@@ -246,16 +257,22 @@ export const createProductReview = async (
     res: Response,
     next: NextFunction
 ) => {
-    const { rating, comment, productId, user_id, user_name } = req.body
+    const { rating, comment, productId, userId, userName } = req.body
 
-    if (!rating || !comment || !productId || !user_id || !user_name) {
+    if (
+        !(rating ?? false) ||
+        !(comment ?? false) ||
+        !(productId ?? false) ||
+        !(userId ?? false) ||
+        !(userName ?? false)
+    ) {
         next(new ErrorHandler('Cannot add review. Not sufficient info.', 404))
         return
     }
     try {
         const review = {
-            user: user_id,
-            name: user_name,
+            user: userId,
+            name: userName,
             rating: Number(rating),
             comment,
         }
@@ -268,13 +285,14 @@ export const createProductReview = async (
         }
 
         const isReviewed = product.reviews.find(
-            (rev) => rev.user.toString() === user_id.toString()
+            (rev) => rev.user.toString() === userId.toString()
         )
 
-        if (isReviewed != null) {
+        if (isReviewed !== null) {
             product.reviews.forEach((rev) => {
-                if (rev.user.toString() === user_id.toString()) {
-                    ;(rev.rating = rating), (rev.comment = comment)
+                if (rev.user.toString() === userId.toString()) {
+                    rev.rating = rating
+                    rev.comment = comment
                 }
             })
         } else {

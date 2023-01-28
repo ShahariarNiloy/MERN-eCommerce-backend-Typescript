@@ -12,8 +12,10 @@ module.exports = {
         project: ['./tsconfig.json'],
     },
     rules: {
-        'brace-style': ['error', 'stroustrup'],
-        'comma-dangle': ['error', 'never'],
+        'brace-style': 'off',
+        '@typescript-eslint/brace-style': 'off',
+        'comma-dangle': 'off',
+        '@typescript-eslint/comma-dangle': 'off',
         'no-unused-vars': ['warn'],
         'no-var': ['error'],
         'one-var': ['error'],

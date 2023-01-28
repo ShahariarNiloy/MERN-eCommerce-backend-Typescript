@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
-const productSchema = new mongoose.Schema({
+const productSchema = new Schema({
     name: {
         type: String,
         required: [true, 'Please Enter product Name'],
@@ -48,7 +48,7 @@ const productSchema = new mongoose.Schema({
     reviews: [
         {
             user: {
-                type: mongoose.Schema.Types.ObjectId,
+                type: Schema.Types.ObjectId,
                 ref: 'User',
                 required: true,
             },
