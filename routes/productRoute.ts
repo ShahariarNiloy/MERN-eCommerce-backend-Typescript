@@ -1,16 +1,29 @@
-import express from "express";
+import express from 'express'
 import {
-  createProduct,
-  getAllProducts,
-  updateProduct,
-} from "../controllers/productController";
+    createProduct,
+    deleteProduct,
+    deleteReview,
+    getAdminProducts,
+    getAllProducts,
+    getProductDetails,
+    getProductReviews,
+    updateProduct,
+} from '../controllers/productController'
+import { createProductReview } from './../controllers/productController'
 
-const router = express.Router();
+const router = express.Router()
 
-router.route("/products").get(getAllProducts);
-// router.route("/product/:id").get(getProductDetails);
-router.route("/admin/product/new").post(createProduct);
-router.route("/admin/product/:id").put(updateProduct);
-//   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
+//* For Admin Routes
+router.route('/admin/product/new').post(createProduct)
+router.route('/admin/product/:id').put(updateProduct).delete(deleteProduct)
+router.route('/admin/products').get(getAdminProducts)
 
-export default router;
+//* For All Routes
+router.route('/products').get(getAllProducts)
+router.route('/product/:id').get(getProductDetails)
+
+//* For Users Routes
+router.route('/reviews').get(getProductReviews).delete(deleteReview)
+router.route('/review').put(createProductReview)
+
+export default router
