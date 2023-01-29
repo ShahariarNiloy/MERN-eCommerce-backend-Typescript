@@ -1,26 +1,26 @@
 import type { RequestHandler } from 'express'
 import express from 'express'
 import {
-    createProduct,
-    deleteProduct,
+    createProductAdmin,
+    deleteProductAdmin,
     deleteReview,
-    getAdminProducts,
     getAllProducts,
     getProductDetails,
     getProductReviews,
-    updateProduct,
+    getProductsAdmin,
+    updateProductAdmin,
 } from '../controllers/productController'
 import { createProductReview } from './../controllers/productController'
 
 const router = express.Router()
 
 //* For Admin Routes
-router.route('/admin/product/new').post(createProduct as RequestHandler)
+router.route('/admin/product/new').post(createProductAdmin as RequestHandler)
 router
     .route('/admin/product/:id')
-    .put(updateProduct as RequestHandler)
-    .delete(deleteProduct as RequestHandler)
-router.route('/admin/products').get(getAdminProducts as RequestHandler)
+    .put(updateProductAdmin as RequestHandler)
+    .delete(deleteProductAdmin as RequestHandler)
+router.route('/admin/products').get(getProductsAdmin as RequestHandler)
 
 //* For All Routes
 router.route('/products').get(getAllProducts as RequestHandler)

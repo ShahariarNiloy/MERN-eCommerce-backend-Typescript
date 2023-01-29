@@ -6,14 +6,14 @@ interface QueryStrTypes {
 
 class ApiFeatures {
     query: any
-    queryStr: QueryStrTypes
-    constructor(query: unknown, queryStr: QueryStrTypes) {
+    queryStr: any
+    constructor(query: any, queryStr: any) {
         this.query = query
         this.queryStr = queryStr
     }
 
     search() {
-        const keyword = this.queryStr?.searchTerm
+        const searchTerm = this.queryStr?.searchTerm
             ? {
                   name: {
                       $regex: this.queryStr?.searchTerm,
@@ -22,7 +22,7 @@ class ApiFeatures {
               }
             : {}
 
-        this.query = this.query.find({ ...keyword })
+        this.query = this.query.find({ ...searchTerm })
         return this
     }
 

@@ -1,6 +1,7 @@
-import mongoose, { Schema } from 'mongoose'
+import { Model, model, Schema } from 'mongoose'
+import { ProductTypes } from './types'
 
-const productSchema = new Schema({
+const productSchema = new Schema<ProductTypes, Model<ProductTypes>, {}>({
     name: {
         type: String,
         required: [true, 'Please Enter product Name'],
@@ -35,7 +36,7 @@ const productSchema = new Schema({
         type: String,
         required: [true, 'Please Enter Product Category'],
     },
-    Stock: {
+    stock: {
         type: Number,
         required: [true, 'Please Enter product Stock'],
         maxLength: [4, 'Stock cannot exceed 4 characters'],
@@ -67,15 +68,17 @@ const productSchema = new Schema({
         },
     ],
 
-    //   user: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "User",
-    //     required: true,
-    //   },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
     },
 })
 
-export default mongoose.model('Product', productSchema)
+const ProductModel = model('Product', productSchema)
+
+export default ProductModel

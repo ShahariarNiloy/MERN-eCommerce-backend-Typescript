@@ -1,9 +1,9 @@
 import type { NextFunction, Request, Response } from 'express'
 import type { ObjectId } from 'mongoose'
-import Product from '../model/productModel'
+import Product from '../model/ProductModel/productModel'
 import ErrorHandler from '../utils/errorHandler'
 
-export const createProduct = async (
+export const createProductAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -46,7 +46,7 @@ export const getAllProducts = async (
     }
 }
 
-export const getAdminProducts = async (
+export const getProductsAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -71,7 +71,7 @@ export const getAdminProducts = async (
     }
 }
 
-export const updateProduct = async (
+export const updateProductAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -119,7 +119,7 @@ export const updateProduct = async (
     }
 }
 
-export const deleteProduct = async (
+export const deleteProductAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
