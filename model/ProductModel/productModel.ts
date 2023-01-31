@@ -68,11 +68,11 @@ const productSchema = new Schema<ProductTypes, Model<ProductTypes>, {}>({
         },
     ],
 
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-    },
+    // user: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'User',
+    //     required: true,
+    // },
     createdAt: {
         type: Date,
         default: Date.now,

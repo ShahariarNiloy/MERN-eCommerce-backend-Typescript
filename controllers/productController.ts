@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import type { ObjectId } from 'mongoose'
 import Product from '../model/ProductModel/productModel'
+import ApiFeatures from '../utils/apiFeatures'
 import ErrorHandler from '../utils/errorHandler'
 
 export const createProductAdmin = async (
@@ -32,8 +33,28 @@ export const getAllProducts = async (
     next: NextFunction
 ) => {
     try {
-        const products = await Product.find()
-        res.status(200).json({ success: true, products })
+        const resultPerPage = 8
+        const productsCount = await Product.countDocuments()
+
+        const apiFeature = new ApiFeatures(Product.find(), req?.query)
+            .search()
+            .filter()
+
+        let products = await apiFeature.query
+
+        let filteredProductsCount = products.length
+
+        apiFeature.pagination(resultPerPage)
+
+        products = await apiFeature.query.clone()
+
+        res.status(200).json({
+            success: true,
+            products,
+            productsCount,
+            resultPerPage,
+            filteredProductsCount,
+        })
     } catch (err: unknown) {
         if (err instanceof Error) {
             res.status(500).json({ success: false, message: err.message })

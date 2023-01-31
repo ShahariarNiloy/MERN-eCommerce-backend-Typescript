@@ -22,6 +22,6 @@ export interface ProductTypes {
     stock: number
     numOfReviews?: number
     reviews: ReviewsTypes[]
-    user: Schema.Types.ObjectId
+    user?: Schema.Types.ObjectId
     createdAt: Date
 }

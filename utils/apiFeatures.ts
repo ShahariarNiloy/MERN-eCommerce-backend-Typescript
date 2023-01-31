@@ -23,6 +23,7 @@ class ApiFeatures {
             : {}
 
         this.query = this.query.find({ ...searchTerm })
+
         return this
     }
 
@@ -54,4 +55,4 @@ class ApiFeatures {
     }
 }
 
-module.exports = ApiFeatures
+export default ApiFeatures
