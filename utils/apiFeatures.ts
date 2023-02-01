@@ -1,5 +1,5 @@
-import { Document, Query, Types } from 'mongoose'
-import { ProductTypes } from '../model/ProductModel/types'
+import type { Document, Query, Types } from 'mongoose'
+import type { ProductTypes } from '../model/ProductModel/types'
 
 interface QueryStrTypes {
     searchTerm?: string
@@ -8,15 +8,17 @@ interface QueryStrTypes {
 }
 
 type QueryType = Query<
-    (Document<ProductTypes> &
-        ProductTypes & {
-            _id: Types.ObjectId
-        })[],
+    Array<
+        Document<ProductTypes> &
+            ProductTypes & {
+                _id: Types.ObjectId
+            }
+    >,
     Document<ProductTypes> &
         ProductTypes & {
             _id: Types.ObjectId
         },
-    {},
+    unknown,
     ProductTypes
 >
 

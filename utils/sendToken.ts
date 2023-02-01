@@ -1,6 +1,6 @@
-import { Response } from 'express'
-import { Document, Types } from 'mongoose'
-import { UserMethodsType, UserType } from '../model/UserModel/userModel'
+import type { Response } from 'express'
+import type { Document, Types } from 'mongoose'
+import type { UserMethodsType, UserType } from '../model/UserModel/userModel'
 
 type User = Document<unknown, any, UserType> &
     UserType & {
