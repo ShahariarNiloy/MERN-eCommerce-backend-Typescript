@@ -1,11 +1,34 @@
-import mongoose from 'mongoose'
+import mongoose, { Model } from 'mongoose'
 import validator from 'validator'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import 'dotenv/config'
 
-const userSchema = new mongoose.Schema({
+export interface UserType {
+    name: string
+    email: string
+    password: string
+    avatar: { public_id: string; url: string }
+    role?: string
+    createdAt?: Date
+    resetPasswordToken: String
+    resetPasswordExpire: Date
+}
+
+export interface UserMethodsType {
+    getJWTToken(): string
+    comparePassword(password: string): Promise<boolean>
+    getResetPasswordToken(): string
+}
+
+export type UserModelType = Model<UserType, {}, UserMethodsType>
+
+const userSchema = new mongoose.Schema<
+    UserType,
+    UserModelType,
+    UserMethodsType
+>({
     name: {
         type: String,
         required: [true, 'Please Enter Your Name'],
@@ -84,6 +107,6 @@ userSchema.methods.getResetPasswordToken = function () {
     return resetToken
 }
 
-const UserModel = mongoose.model('User', userSchema)
+const UserModel = mongoose.model<UserType, UserModelType>('User', userSchema)
 
 export default UserModel

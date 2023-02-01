@@ -1,13 +1,29 @@
+import { Document, Query, Types } from 'mongoose'
+import { ProductTypes } from '../model/ProductModel/types'
+
 interface QueryStrTypes {
     searchTerm?: string
-    page?: number
-    limit?: number
+    page?: string | number
+    limit?: string | number
 }
 
+type QueryType = Query<
+    (Document<ProductTypes> &
+        ProductTypes & {
+            _id: Types.ObjectId
+        })[],
+    Document<ProductTypes> &
+        ProductTypes & {
+            _id: Types.ObjectId
+        },
+    {},
+    ProductTypes
+>
+
 class ApiFeatures {
-    query: any
-    queryStr: any
-    constructor(query: any, queryStr: any) {
+    query: QueryType
+    queryStr: QueryStrTypes
+    constructor(query: QueryType, queryStr: QueryStrTypes) {
         this.query = query
         this.queryStr = queryStr
     }
@@ -45,7 +61,7 @@ class ApiFeatures {
     }
 
     pagination(resultPerPage: number) {
-        const currentPage = Number(this.queryStr.page) || 1
+        const currentPage = Number(this.queryStr?.page) || 1
 
         const skip = resultPerPage * (currentPage - 1)
 

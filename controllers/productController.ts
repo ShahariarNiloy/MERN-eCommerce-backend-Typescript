@@ -178,7 +178,7 @@ export const getProductDetails = async (
     try {
         const product = await Product.findById(req.params.id)
 
-        if (product == null) {
+        if (product === null) {
             next(new ErrorHandler('Product not found', 404))
             return
         }

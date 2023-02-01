@@ -5,6 +5,7 @@ import fileUpload from 'express-fileupload'
 import ErrorFunc from './middlewares/error'
 
 import product from './routes/productRoute'
+import user from './routes/userRoutes'
 
 const app = express()
 
@@ -14,6 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(fileUpload())
 
 app.use('/api/v1', product)
+app.use('/api/v1', user)
 
 app.use(ErrorFunc)
 
