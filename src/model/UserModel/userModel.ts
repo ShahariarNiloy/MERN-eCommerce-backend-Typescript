@@ -1,28 +1,10 @@
-import mongoose, { Model } from 'mongoose'
-import validator from 'validator'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import 'dotenv/config'
-
-export interface UserType {
-    name: string
-    email: string
-    password: string
-    avatar: { public_id: string; url: string }
-    role?: string
-    createdAt?: Date
-    resetPasswordToken: String
-    resetPasswordExpire: Date
-}
-
-export interface UserMethodsType {
-    getJWTToken(): string
-    comparePassword(password: string): Promise<boolean>
-    getResetPasswordToken(): string
-}
-
-export type UserModelType = Model<UserType, {}, UserMethodsType>
+import jwt from 'jsonwebtoken'
+import mongoose from 'mongoose'
+import validator from 'validator'
+import { UserMethodsType, UserModelType, UserType } from './types'
 
 const userSchema = new mongoose.Schema<
     UserType,

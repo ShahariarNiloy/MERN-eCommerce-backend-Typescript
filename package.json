@@ -5,11 +5,11 @@
     "main": "server.ts",
     "scripts": {
         "build": "npx tsc",
-        "start": "node server.ts",
-        "dev": "nodemon server.ts",
-        "lint": "eslint \"./**/*.ts\" --quiet",
-        "lintFull": "eslint \"./**/*.ts\"",
-        "lintFix": "eslint --fix './**/*.ts'"
+        "start": "node ./src/server.ts",
+        "dev": "nodemon ./src/server.ts",
+        "lint": "eslint \"./src/**/*.ts\" --quiet",
+        "lintFull": "eslint \"./src/**/*.ts\"",
+        "lintFix": "eslint --fix './src/**/*.ts'"
     },
     "keywords": [
         "expressjs",
@@ -24,14 +24,11 @@
         "cloudinary": "^1.33.0",
         "cookie-parser": "^1.4.6",
         "dotenv": "^16.0.3",
-        "eslint": "^8.0.1",
-        "eslint-config-prettier": "^8.6.0",
         "express": "^4.18.2",
         "express-fileupload": "^1.4.0",
         "jsonwebtoken": "^9.0.0",
         "mongoose": "^6.9.0",
         "nodemailer": "^6.9.1",
-        "prettier": "^2.8.3",
         "ts-node": "^10.9.1",
         "validator": "^13.7.0"
     },
@@ -49,6 +46,18 @@
         "eslint-plugin-n": "^15.0.0",
         "eslint-plugin-promise": "^6.0.0",
         "nodemon": "^2.0.20",
-        "typescript": "*"
+        "typescript": "*",
+        "@typescript-eslint/parser": "^2.6.1",
+        "eslint-config-airbnb": "^17.1.0",
+        "eslint-config-prettier": "^8.6.0",
+        "eslint-formatter-friendly": "^6.0.0",
+        "eslint-import-resolver-webpack": "^0.10.1",
+        "eslint-loader": "^2.1.0",
+        "eslint-plugin-jsx-a11y": "^6.1.1",
+        "eslint-plugin-prettier": "^3.1.1",
+        "eslint-plugin-react": "^7.11.1",
+        "eslint-plugin-react-redux": "^2.3.0",
+        "prettier": "^2.8.3",
+        "eslint": "^8.0.1"
     }
 }

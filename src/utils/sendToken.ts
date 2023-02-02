@@ -1,6 +1,6 @@
 import type { Response } from 'express'
 import type { Document, Types } from 'mongoose'
-import type { UserMethodsType, UserType } from '../model/UserModel/userModel'
+import { UserMethodsType, UserType } from '../model/UserModel/types'
 
 type User = Document<unknown, any, UserType> &
     UserType & {
