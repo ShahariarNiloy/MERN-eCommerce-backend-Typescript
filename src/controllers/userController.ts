@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import { Types } from 'mongoose'
 import UserModel from '../model/UserModel/userModel'
 import ErrorHandler from '../utils/errorHandler'
@@ -8,54 +8,52 @@ export const registerUser = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     const { name, email, password } = req.body
 
-    if (!(name ?? false) || !(email ?? false) || !(password ?? false)) {
-        next(
-            new ErrorHandler('Cannot register user. Not sufficient info.', 400)
-        )
-        return
-    }
-
-    try {
-        const user = await UserModel.create({
-            name,
-            email,
-            password,
-            avatar: {
-                public_id: 'myCloud.public_id',
-                url: ' myCloud.secure_url',
-            },
-        })
-        SendToken(user, 201, res)
-    } catch (err: unknown) {
-        if (err instanceof Error) {
-            res.status(400).json({ success: false, message: err.message })
-        } else {
-            res.status(400).json({
-                success: false,
-                message: 'Something went wrong',
+    if (Boolean(name) && Boolean(email) && Boolean(password)) {
+        try {
+            const user = await UserModel.create({
+                name,
+                email,
+                password,
+                avatar: {
+                    public_id: 'myCloud.public_id',
+                    url: ' myCloud.secure_url',
+                },
             })
+            SendToken(user, 201, res)
+            return
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                res.status(400).json({ success: false, message: err.message })
+            } else {
+                res.status(400).json({
+                    success: false,
+                    message: 'Something went wrong',
+                })
+            }
+            return
         }
     }
+    next(new ErrorHandler('Cannot register user. Not sufficient info.', 400))
 }
 
 export const loginUser = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     const { email, password } = req?.body
 
-    if (!(email ?? false) || !(password ?? false)) {
+    if (!(Boolean(email) && Boolean(password))) {
         next(new ErrorHandler('Enter email and password', 400))
         return
     }
 
     const user = await UserModel.findOne({ email }).select('+password')
 
-    if (!(user ?? false) || user === null) {
+    if (user === null) {
         next(new ErrorHandler('Invalid credentials', 401))
         return
     }
@@ -74,7 +72,7 @@ export const logout = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     res.cookie('token', null, {
         expires: new Date(Date.now()),
         httpOnly: true,
@@ -86,7 +84,10 @@ export const logout = async (
     })
 }
 
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
     try {
         const users = await UserModel.find()
 
@@ -107,10 +108,10 @@ export const getUser = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     const { id } = req?.params
 
-    if (Types.ObjectId.isValid(id) === false) {
+    if (Types.ObjectId.isValid(id)) {
         next(new ErrorHandler('Invalid Request', 400))
         return
     }
@@ -135,10 +136,10 @@ export const updateUserRole = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     const { id } = req?.params
 
-    if (Types.ObjectId.isValid(id) === false) {
+    if (!Types.ObjectId.isValid(id)) {
         next(new ErrorHandler('Invalid Request', 400))
         return
     }
@@ -175,17 +176,17 @@ export const deleteUser = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     const { id } = req?.params
 
-    if (Types.ObjectId.isValid(id) === false) {
+    if (!Types.ObjectId.isValid(id)) {
         next(new ErrorHandler('Invalid Request', 400))
         return
     }
 
     const user = await UserModel.findById(id)
 
-    if (!user) {
+    if (user === null) {
         next(new ErrorHandler(`User does not exist with Id: ${id}`, 400))
         return
     }

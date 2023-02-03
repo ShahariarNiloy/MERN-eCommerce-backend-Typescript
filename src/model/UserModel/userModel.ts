@@ -4,7 +4,7 @@ import 'dotenv/config'
 import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
 import validator from 'validator'
-import { UserMethodsType, UserModelType, UserType } from './types'
+import type { UserMethodsType, UserModelType, UserType } from './types'
 
 const userSchema = new mongoose.Schema<
     UserType,
@@ -62,8 +62,8 @@ userSchema.pre('save', async function (next) {
 
 // JWT TOKEN
 userSchema.methods.getJWTToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET || 'secret', {
-        expiresIn: process.env.JWT_EXPIRE || 1,
+    return jwt.sign({ id: this._id }, process.env.JWT_SECRET ?? 'secret', {
+        expiresIn: process.env.JWT_EXPIRE ?? 1,
     })
 }
 

@@ -9,6 +9,7 @@ module.exports = {
     parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
+        tsconfigRootDir: __dirname,
         project: ['./tsconfig.json'],
     },
     rules: {
@@ -16,10 +17,10 @@ module.exports = {
         '@typescript-eslint/brace-style': 'off',
         'comma-dangle': 'off',
         '@typescript-eslint/comma-dangle': 'off',
-        'no-unused-vars': ['warn'],
+        'no-unused-vars': ['error'],
         'no-var': ['error'],
         'one-var': ['error'],
-        'no-console': 'warn',
+        'no-console': 'off',
         '@typescript-eslint/explicit-function-return-type': 'warn',
     },
 }

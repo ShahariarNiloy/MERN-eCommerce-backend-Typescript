@@ -1,4 +1,5 @@
 import express from 'express'
+import type { RequestHandler } from 'express'
 import {
     deleteUser,
     loginUser,
@@ -9,13 +10,13 @@ import { getAllUsers, getUser } from './../controllers/userController'
 
 const router = express.Router()
 
-router.route('/register').post(registerUser)
-router.route('/login').post(loginUser)
-router.route('/admin/users').get(getAllUsers)
+router.route('/register').post(registerUser as RequestHandler)
+router.route('/login').post(loginUser as RequestHandler)
+router.route('/admin/users').get(getAllUsers as RequestHandler)
 router
     .route('/admin/user/:id')
-    .get(getUser)
-    .put(updateUserRole)
-    .delete(deleteUser)
+    .get(getUser as RequestHandler)
+    .put(updateUserRole as RequestHandler)
+    .delete(deleteUser as RequestHandler)
 
 export default router

@@ -1,13 +1,13 @@
 import type { Response } from 'express'
 import type { Document, Types } from 'mongoose'
-import { UserMethodsType, UserType } from '../model/UserModel/types'
+import type { UserMethodsType, UserType } from '../model/UserModel/types'
 
 type User = Document<unknown, any, UserType> &
     UserType & {
         _id: Types.ObjectId
     } & UserMethodsType
 
-const SendToken = (user: User, statusCode: number, res: Response) => {
+const SendToken = (user: User, statusCode: number, res: Response): void => {
     const token = user.getJWTToken()
 
     const cookieOptions = {

@@ -1,7 +1,8 @@
-import { Model, model, Schema } from 'mongoose'
-import { ProductTypes } from './types'
+import type { Model } from 'mongoose'
+import { model, Schema } from 'mongoose'
+import type { ProductTypes } from './types'
 
-const productSchema = new Schema<ProductTypes, Model<ProductTypes>, {}>({
+const productSchema = new Schema<ProductTypes, Model<ProductTypes>, unknown>({
     name: {
         type: String,
         required: [true, 'Please Enter product Name'],
@@ -68,11 +69,11 @@ const productSchema = new Schema<ProductTypes, Model<ProductTypes>, {}>({
         },
     ],
 
-    // user: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'User',
-    //     required: true,
-    // },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now,

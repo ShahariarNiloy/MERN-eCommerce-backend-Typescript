@@ -1,14 +1,15 @@
 import ErrorHandler from '../utils/errorHandler'
 
 import type { ErrorRequestHandler } from 'express'
+import { Error } from 'mongoose'
 
 const ErrorFunc: ErrorRequestHandler = (err, req, res, next) => {
     err.statusCode = err.statusCode ?? 500
     err.message = err.message ?? 'Internal Server Error'
 
     // Wrong Mongodb Id error
-    if (err.name === 'CastError') {
-        const message = `Resource not found. ${err.path ?? ''}`
+    if (err instanceof Error.CastError && err.name === 'CastError') {
+        const message = `Resource not found. ${err?.path}`
         err = new ErrorHandler(message, 400)
     }
 

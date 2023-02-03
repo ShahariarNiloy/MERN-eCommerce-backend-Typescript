@@ -8,7 +8,7 @@ export const createProductAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     try {
         const product = await Product.create(req.body)
         res.status(201).json({
@@ -31,7 +31,7 @@ export const getAllProducts = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     try {
         const resultPerPage = 8
         const productsCount = await Product.countDocuments()
@@ -42,7 +42,7 @@ export const getAllProducts = async (
 
         let products = await apiFeature.query
 
-        let filteredProductsCount = products.length
+        const filteredProductsCount = products.length
 
         apiFeature.pagination(resultPerPage)
 
@@ -71,7 +71,7 @@ export const getProductsAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     try {
         const products = await Product.find()
 
@@ -81,9 +81,8 @@ export const getProductsAdmin = async (
         })
     } catch (err: unknown) {
         if (err instanceof Error) {
-            return res
-                .status(500)
-                .json({ success: false, message: err.message })
+            res.status(500).json({ success: false, message: err.message })
+            return
         }
         res.status(500).json({
             success: false,
@@ -96,7 +95,7 @@ export const updateProductAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     try {
         let product = await Product.findById(req.params.id)
 
@@ -130,13 +129,13 @@ export const updateProductAdmin = async (
         })
     } catch (err: unknown) {
         if (err instanceof Error) {
-            return res
-                .status(500)
-                .json({ success: false, message: err.message })
+            res.status(500).json({ success: false, message: err.message })
+            return
         }
-        return res
-            .status(500)
-            .json({ success: false, message: 'Something went wrong' })
+        res.status(500).json({
+            success: false,
+            message: 'Something went wrong',
+        })
     }
 }
 
@@ -144,7 +143,7 @@ export const deleteProductAdmin = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     try {
         const product = await Product.findById(req.params.id)
 
@@ -160,13 +159,13 @@ export const deleteProductAdmin = async (
         })
     } catch (err: unknown) {
         if (err instanceof Error) {
-            return res
-                .status(500)
-                .json({ success: false, message: err.message })
+            res.status(500).json({ success: false, message: err.message })
+            return
         }
-        return res
-            .status(500)
-            .json({ success: false, message: 'Something went wrong' })
+        res.status(500).json({
+            success: false,
+            message: 'Something went wrong',
+        })
     }
 }
 
@@ -174,7 +173,7 @@ export const getProductDetails = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     try {
         const product = await Product.findById(req.params.id)
 
@@ -189,13 +188,13 @@ export const getProductDetails = async (
         })
     } catch (err) {
         if (err instanceof Error) {
-            return res
-                .status(500)
-                .json({ success: false, message: err.message })
+            res.status(500).json({ success: false, message: err.message })
+            return
         }
-        return res
-            .status(500)
-            .json({ success: false, message: 'Something went wrong' })
+        res.status(500).json({
+            success: false,
+            message: 'Something went wrong',
+        })
     }
 }
 
@@ -203,7 +202,7 @@ export const getProductReviews = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     const product = await Product.findById(req.query.id)
 
     if (product === null) {
@@ -221,7 +220,7 @@ export const deleteReview = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     const product = await Product.findById(req.query.id)
 
     if (product == null) {
@@ -277,15 +276,17 @@ export const createProductReview = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     const { rating, comment, productId, userId, userName } = req.body
 
     if (
-        !(rating ?? false) ||
-        !(comment ?? false) ||
-        !(productId ?? false) ||
-        !(userId ?? false) ||
-        !(userName ?? false)
+        !(
+            Boolean(rating) &&
+            Boolean(comment) &&
+            Boolean(productId) &&
+            Boolean(userId) &&
+            Boolean(userName)
+        )
     ) {
         next(new ErrorHandler('Cannot add review. Not sufficient info.', 404))
         return
@@ -306,14 +307,14 @@ export const createProductReview = async (
         }
 
         const isReviewed = product.reviews.find(
-            (rev) => rev.user.toString() === userId.toString()
+            (review) => JSON.stringify(review.user) === userId.toString()
         )
 
         if (isReviewed !== null) {
-            product.reviews.forEach((rev) => {
-                if (rev.user.toString() === userId.toString()) {
-                    rev.rating = rating
-                    rev.comment = comment
+            product.reviews.forEach((review) => {
+                if (JSON.stringify(review.user) === userId.toString()) {
+                    review.rating = rating
+                    review.comment = comment
                 }
             })
         } else {
@@ -336,9 +337,8 @@ export const createProductReview = async (
         })
     } catch (err: unknown) {
         if (err instanceof Error) {
-            return res
-                .status(404)
-                .json({ success: false, message: err.message })
+            res.status(404).json({ success: false, message: err.message })
+            return
         }
         res.status(500).json({
             success: false,

@@ -1,4 +1,4 @@
-import { Model } from 'mongoose'
+import type { Model } from 'mongoose'
 
 export interface UserType {
     name: string
@@ -7,14 +7,14 @@ export interface UserType {
     avatar: { public_id: string; url: string }
     role?: string
     createdAt?: Date
-    resetPasswordToken: String
+    resetPasswordToken: string
     resetPasswordExpire: Date
 }
 
 export interface UserMethodsType {
-    getJWTToken(): string
-    comparePassword(password: string): Promise<boolean>
-    getResetPasswordToken(): string
+    getJWTToken: () => string
+    comparePassword: (password: string) => Promise<boolean>
+    getResetPasswordToken: () => string
 }
 
-export type UserModelType = Model<UserType, {}, UserMethodsType>
+export type UserModelType = Model<UserType, unknown, UserMethodsType>

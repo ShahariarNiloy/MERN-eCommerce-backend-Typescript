@@ -30,26 +30,29 @@ class ApiFeatures {
         this.queryStr = queryStr
     }
 
-    search() {
-        const searchTerm = this.queryStr?.searchTerm
-            ? {
-                  name: {
-                      $regex: this.queryStr?.searchTerm,
-                      $options: 'i',
-                  },
-              }
-            : {}
+    search(): this {
+        const searchTerm =
+            this.queryStr?.searchTerm !== null &&
+            this.queryStr?.searchTerm !== undefined
+                ? {
+                      name: {
+                          $regex: this.queryStr?.searchTerm,
+                          $options: 'i',
+                      },
+                  }
+                : {}
 
         this.query = this.query.find({ ...searchTerm })
 
         return this
     }
 
-    filter() {
+    filter(): this {
         const queryCopy: any = { ...this.queryStr }
         //   Removing some fields for category
         const removeFields = ['searchTerm', 'page', 'limit']
 
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         removeFields.forEach((key) => delete queryCopy[key])
 
         // Filter For Price and Rating
@@ -62,8 +65,8 @@ class ApiFeatures {
         return this
     }
 
-    pagination(resultPerPage: number) {
-        const currentPage = Number(this.queryStr?.page) || 1
+    pagination(resultPerPage: number): this {
+        const currentPage = Number(this.queryStr?.page) ?? 1
 
         const skip = resultPerPage * (currentPage - 1)
 
