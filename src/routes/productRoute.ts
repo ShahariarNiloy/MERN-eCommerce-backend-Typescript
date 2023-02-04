@@ -10,6 +10,7 @@ import {
     getProductsAdmin,
     updateProductAdmin,
 } from '../controllers/productController'
+import { isAuthenticatedUser } from '../middlewares/authCheck'
 import { createProductReview } from './../controllers/productController'
 
 const router = express.Router()
@@ -23,7 +24,12 @@ router
 router.route('/admin/products').get(getProductsAdmin as RequestHandler)
 
 //* For All Routes
-router.route('/products').get(getAllProducts as RequestHandler)
+router
+    .route('/products')
+    .get(
+        isAuthenticatedUser as unknown as RequestHandler,
+        getAllProducts as RequestHandler
+    )
 router.route('/product/:id').get(getProductDetails as RequestHandler)
 
 //* For Users Routes

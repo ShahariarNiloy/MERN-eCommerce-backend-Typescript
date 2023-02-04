@@ -32,6 +32,7 @@ export const getAllProducts = async (
     res: Response,
     next: NextFunction
 ): Promise<void> => {
+    console.log('products')
     try {
         const resultPerPage = 8
         const productsCount = await Product.countDocuments()

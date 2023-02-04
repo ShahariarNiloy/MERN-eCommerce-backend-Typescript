@@ -47,7 +47,7 @@ export const loginUser = async (
     const { email, password } = req?.body
 
     if (!(Boolean(email) && Boolean(password))) {
-        next(new ErrorHandler('Enter email and password', 400))
+        next(new ErrorHandler('Enter email and password', 401))
         return
     }
 
@@ -60,7 +60,7 @@ export const loginUser = async (
 
     const isPasswordMatched = await user.comparePassword(password)
 
-    if (isPasswordMatched) {
+    if (!isPasswordMatched) {
         next(new ErrorHandler('Invalid credentials', 401))
         return
     }
@@ -68,7 +68,7 @@ export const loginUser = async (
     SendToken(user, 200, res)
 }
 
-export const logout = async (
+export const logoutUser = async (
     req: Request,
     res: Response,
     next: NextFunction

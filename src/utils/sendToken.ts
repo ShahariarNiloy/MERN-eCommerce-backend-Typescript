@@ -10,15 +10,14 @@ type User = Document<unknown, any, UserType> &
 const SendToken = (user: User, statusCode: number, res: Response): void => {
     const token = user.getJWTToken()
 
-    const cookieOptions = {
-        expires: new Date(
-            Date.now() +
-                (Number(process.env.COOKIE_EXPIRE) ?? 2) * 24 * 60 * 60 * 1000
-        ),
-        httpOnly: true,
-    }
+    // const GMT_BD = 6 * 60 * 60 * 1000
 
-    res.status(statusCode).cookie('token', token, cookieOptions).json({
+    // const cookieOptions = {
+    //     expires: new Date(Number(new Date()) + GMT_BD + 2 * 60 * 60 * 1000),
+    //     httpOnly: true,
+    // }
+
+    res.status(statusCode).cookie('token', token).json({
         success: true,
         user,
         token,
