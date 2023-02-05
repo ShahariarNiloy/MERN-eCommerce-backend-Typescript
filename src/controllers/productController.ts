@@ -1,15 +1,28 @@
 import type { NextFunction, Request, Response } from 'express'
-import type { ObjectId } from 'mongoose'
+import type { Document, ObjectId, Types } from 'mongoose'
 import Product from '../model/ProductModel/productModel'
+import type { UserMethodsType, UserType } from '../model/UserModel/types'
 import ApiFeatures from '../utils/apiFeatures'
 import ErrorHandler from '../utils/errorHandler'
 
+export interface RequestUserType extends Request {
+    user?:
+        | (Document<unknown, any, UserType> &
+              UserType & {
+                  _id: Types.ObjectId
+              } & UserMethodsType)
+        | null
+}
+
 export const createProductAdmin = async (
-    req: Request,
+    req: RequestUserType,
     res: Response,
     next: NextFunction
 ): Promise<void> => {
     try {
+        if (req.user !== null && req.user !== undefined) {
+            req.body.user = req.user.id
+        }
         const product = await Product.create(req.body)
         res.status(201).json({
             success: true,
@@ -32,7 +45,6 @@ export const getAllProducts = async (
     res: Response,
     next: NextFunction
 ): Promise<void> => {
-    console.log('products')
     try {
         const resultPerPage = 8
         const productsCount = await Product.countDocuments()

@@ -10,26 +10,41 @@ import {
     getProductsAdmin,
     updateProductAdmin,
 } from '../controllers/productController'
-import { isAuthenticatedUser } from '../middlewares/authCheck'
+import { authorizeRoles, isAuthenticatedUser } from '../middlewares/authCheck'
 import { createProductReview } from './../controllers/productController'
 
 const router = express.Router()
 
 //* For Admin Routes
-router.route('/admin/product/new').post(createProductAdmin as RequestHandler)
+router
+    .route('/admin/product/new')
+    .post(
+        isAuthenticatedUser as unknown as RequestHandler,
+        authorizeRoles('admin') as unknown as RequestHandler,
+        createProductAdmin as RequestHandler
+    )
 router
     .route('/admin/product/:id')
-    .put(updateProductAdmin as RequestHandler)
-    .delete(deleteProductAdmin as RequestHandler)
-router.route('/admin/products').get(getProductsAdmin as RequestHandler)
-
-//* For All Routes
+    .put(
+        isAuthenticatedUser as unknown as RequestHandler,
+        authorizeRoles('admin') as unknown as RequestHandler,
+        updateProductAdmin as RequestHandler
+    )
+    .delete(
+        isAuthenticatedUser as unknown as RequestHandler,
+        authorizeRoles('admin') as unknown as RequestHandler,
+        deleteProductAdmin as RequestHandler
+    )
 router
-    .route('/products')
+    .route('/admin/products')
     .get(
         isAuthenticatedUser as unknown as RequestHandler,
-        getAllProducts as RequestHandler
+        authorizeRoles('admin') as unknown as RequestHandler,
+        getProductsAdmin as RequestHandler
     )
+
+//* For All Routes
+router.route('/products').get(getAllProducts as RequestHandler)
 router.route('/product/:id').get(getProductDetails as RequestHandler)
 
 //* For Users Routes

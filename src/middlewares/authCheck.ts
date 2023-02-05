@@ -1,10 +1,17 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
+import type { Document, Types } from 'mongoose'
+import type { UserMethodsType, UserType } from '../model/UserModel/types'
 import UserModel from '../model/UserModel/userModel'
 import ErrorHandler from '../utils/errorHandler'
 
 export interface RequestUserType extends Request {
-    user: string | null
+    user:
+        | (Document<unknown, any, UserType> &
+              UserType & {
+                  _id: Types.ObjectId
+              } & UserMethodsType)
+        | null
 }
 
 interface JwtPayload {
@@ -35,5 +42,25 @@ export const isAuthenticatedUser = async (
         if (err instanceof Error) {
             next(new ErrorHandler(JSON.stringify(err), 401))
         }
+    }
+}
+
+export const authorizeRoles = (...roles: string[]) => {
+    return (req: RequestUserType, _res: Response, next: NextFunction) => {
+        if (req?.user?.role === undefined || req?.user?.role === null) {
+            next(new ErrorHandler(`Resources are not accessible`, 403))
+            return
+        }
+        if (!roles.includes(req?.user?.role)) {
+            next(
+                new ErrorHandler(
+                    `Role: ${req?.user?.role} is not allowed to access this resource `,
+                    403
+                )
+            )
+            return
+        }
+
+        next()
     }
 }

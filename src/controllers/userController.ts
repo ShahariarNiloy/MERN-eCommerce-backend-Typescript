@@ -3,6 +3,8 @@ import { Types } from 'mongoose'
 import UserModel from '../model/UserModel/userModel'
 import ErrorHandler from '../utils/errorHandler'
 import SendToken from '../utils/sendToken'
+import * as crypto from 'crypto'
+import sendEmail from '../utils/sendEmail'
 
 export const registerUser = async (
     req: Request,
@@ -95,12 +97,12 @@ export const getAllUsers = async (
     } catch (err: unknown) {
         if (err instanceof Error) {
             res.status(500).json({ success: false, message: err.message })
-        } else {
-            res.status(500).json({
-                success: false,
-                message: 'Something went wrong',
-            })
+            return
         }
+        res.status(500).json({
+            success: false,
+            message: 'Something went wrong',
+        })
     }
 }
 
@@ -201,4 +203,93 @@ export const deleteUser = async (
         success: true,
         message: 'User Deleted Successfully',
     })
+}
+
+export const forgotPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    const user = await UserModel.findOne({ email: req.body.email })
+
+    if (user === null || user === undefined) {
+        next(new ErrorHandler('User not found', 404))
+        return
+    }
+
+    // Get ResetPassword Token
+    const resetToken = user.getResetPasswordToken()
+
+    await user.save({ validateBeforeSave: false })
+
+    const resetPasswordUrl = `${req.protocol}://${
+        req.get('host') as string
+    }/password/reset/${resetToken}`
+
+    const message = `Your password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, please ignore it.`
+
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: `eCommerce Password Recovery`,
+            message,
+        })
+
+        res.status(200).json({
+            success: true,
+            message: `Email sent to ${user.email} successfully`,
+        })
+    } catch (err) {
+        user.resetPasswordToken = ''
+        user.resetPasswordExpire = new Date()
+
+        await user.save({ validateBeforeSave: false })
+        if (err instanceof Error) {
+            next(new ErrorHandler(err.message, 500))
+            return
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Something went wrong',
+        })
+    }
+}
+
+export const resetPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    const resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(req.params.token)
+        .digest('hex')
+
+    const user = await UserModel.findOne({
+        resetPasswordToken,
+        resetPasswordExpire: { $gt: Date.now() },
+    })
+
+    if (user === null || user === undefined) {
+        next(
+            new ErrorHandler(
+                'Reset Password Token is invalid or has been expired',
+                400
+            )
+        )
+        return
+    }
+
+    if (req.body.password !== req.body.confirmPassword) {
+        next(new ErrorHandler('Password does not password', 400))
+        return
+    }
+
+    user.password = req.body.password
+    user.resetPasswordToken = ''
+    user.resetPasswordExpire = new Date()
+
+    await user.save()
+
+    SendToken(user, 200, res)
 }
