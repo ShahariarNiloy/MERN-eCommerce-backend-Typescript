@@ -1,13 +1,17 @@
-import express from 'express'
+import { forgotPassword, resetPassword } from './../controllers/authController'
 import type { RequestHandler } from 'express'
+import express from 'express'
 import {
-    deleteUser,
     loginUser,
     logoutUser,
     registerUser,
+} from '../controllers/authController'
+import {
+    deleteUser,
+    getAllUsers,
+    getUser,
     updateUserRole,
-} from '../controllers/userController'
-import { getAllUsers, getUser } from './../controllers/userController'
+} from './../controllers/userController'
 
 const router = express.Router()
 
@@ -21,5 +25,9 @@ router
     .get(getUser as RequestHandler)
     .put(updateUserRole as RequestHandler)
     .delete(deleteUser as RequestHandler)
+
+router.route('/password/forgot').post(forgotPassword as RequestHandler)
+
+router.route('/password/reset/:token').put(resetPassword as RequestHandler)
 
 export default router
