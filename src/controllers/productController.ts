@@ -16,8 +16,7 @@ export interface RequestUserType extends Request {
 
 export const createProductAdmin = async (
     req: RequestUserType,
-    res: Response,
-    next: NextFunction
+    res: Response
 ): Promise<void> => {
     try {
         if (req.user !== null && req.user !== undefined) {
@@ -42,8 +41,7 @@ export const createProductAdmin = async (
 
 export const getAllProducts = async (
     req: Request,
-    res: Response,
-    next: NextFunction
+    res: Response
 ): Promise<void> => {
     try {
         const resultPerPage = 8
@@ -81,7 +79,7 @@ export const getAllProducts = async (
 }
 
 export const getProductsAdmin = async (
-    req: Request,
+    _req: Request,
     res: Response,
     next: NextFunction
 ): Promise<void> => {

@@ -9,10 +9,12 @@ interface MailOptionType {
 const sendEmail = async (options: MailOptionType): Promise<void> => {
     try {
         const transporter = nodeMailer.createTransport({
-            host: process.env.SMPT_HOST as string,
+            service: process.env.SMPT_SERVICE,
+            host: process.env.SMPT_HOST,
             port: Number(process.env.SMPT_PORT),
+            secure: true,
             auth: {
-                user: process.env.SMPT_USER,
+                user: process.env.SMPT_MAIL,
                 pass: process.env.SMPT_PASSWORD,
             },
         })
