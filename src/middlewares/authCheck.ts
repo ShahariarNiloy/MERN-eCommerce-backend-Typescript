@@ -23,7 +23,7 @@ export const isAuthenticatedUser = async (
     res: Response,
     next: NextFunction
 ): Promise<void> => {
-    const bearerHeader = req?.headers?.authorization
+    const bearerHeader = req.headers.authorization
     const token = bearerHeader?.split(' ')?.[1]
 
     if (token === null || token === undefined) {

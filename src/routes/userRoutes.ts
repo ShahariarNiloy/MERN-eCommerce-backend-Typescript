@@ -1,4 +1,3 @@
-import { forgotPassword, resetPassword } from './../controllers/authController'
 import type { RequestHandler } from 'express'
 import express from 'express'
 import {
@@ -6,10 +5,13 @@ import {
     logoutUser,
     registerUser,
 } from '../controllers/authController'
+import { isAuthenticatedUser } from '../middlewares/authCheck'
+import { forgotPassword, resetPassword } from './../controllers/authController'
 import {
     deleteUser,
     getAllUsers,
     getUser,
+    getUserDetails,
     updateUserRole,
 } from './../controllers/userController'
 
@@ -25,6 +27,13 @@ router
     .get(getUser as RequestHandler)
     .put(updateUserRole as RequestHandler)
     .delete(deleteUser as RequestHandler)
+
+router
+    .route('/me')
+    .get(
+        isAuthenticatedUser as unknown as RequestHandler,
+        getUserDetails as RequestHandler
+    )
 
 router.route('/password/forgot').post(forgotPassword as RequestHandler)
 

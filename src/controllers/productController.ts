@@ -4,8 +4,9 @@ import Product from '../model/ProductModel/productModel'
 import type { UserMethodsType, UserType } from '../model/UserModel/types'
 import ApiFeatures from '../utils/apiFeatures'
 import ErrorHandler from '../utils/errorHandler'
+// import type { RequestUserType } from './type'
 
-export interface RequestUserType extends Request {
+interface RequestUserType extends Request {
     user?:
         | (Document<unknown, any, UserType> &
               UserType & {
@@ -19,7 +20,12 @@ export const createProductAdmin = async (
     res: Response
 ): Promise<void> => {
     try {
-        if (req.user !== null && req.user !== undefined) {
+        if (
+            req.user !== null &&
+            req.user !== undefined &&
+            req.body !== undefined &&
+            req.body !== null
+        ) {
             req.body.user = req.user.id
         }
         const product = await Product.create(req.body)
