@@ -211,3 +211,61 @@ export const updatePassword = async (
         })
     }
 }
+
+export const updateProfile = async (
+    req: RequestUserType,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    const { name, email, avatar } = req.body
+
+    if (!(Boolean(name) && Boolean(email))) {
+        next(new ErrorHandler('Not sufficient info.', 404))
+        return
+    }
+
+    const newUserData = {
+        name,
+        email,
+        avatar,
+    }
+
+    if (req.user === undefined || req.user === null) {
+        next(new ErrorHandler('Authentication required.', 400))
+        return
+    }
+
+    if (req.body.avatar !== '') {
+        const user = await UserModel.findById(req.user.id)
+
+        if (user === undefined || user === null) {
+            next(new ErrorHandler('User not found.', 400))
+            return
+        }
+        // const imageId = user.avatar.public_id
+
+        // await cloudinary.v2.uploader.destroy(imageId)
+
+        // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+        //     folder: 'avatars',
+        //     width: 150,
+        //     crop: 'scale',
+        // })
+
+        newUserData.avatar = {
+            public_id: 'myCloud.public_id',
+            url: 'myCloud.secure_url',
+        }
+    }
+
+    const user = await UserModel.findByIdAndUpdate(req.user.id, newUserData, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+    })
+
+    res.status(200).json({
+        success: true,
+        user,
+    })
+}
