@@ -235,37 +235,116 @@ export const updateProfile = async (
         return
     }
 
-    if (req.body.avatar !== '') {
-        const user = await UserModel.findById(req.user.id)
+    try {
+        if (req.body.avatar !== '') {
+            const user = await UserModel.findById(req.user.id)
 
-        if (user === undefined || user === null) {
-            next(new ErrorHandler('User not found.', 400))
+            if (user === undefined || user === null) {
+                next(new ErrorHandler('User not found.', 400))
+                return
+            }
+            // const imageId = user.avatar.public_id
+
+            // await cloudinary.v2.uploader.destroy(imageId)
+
+            // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+            //     folder: 'avatars',
+            //     width: 150,
+            //     crop: 'scale',
+            // })
+
+            newUserData.avatar = {
+                public_id: 'myCloud.public_id',
+                url: 'myCloud.secure_url',
+            }
+        }
+
+        const user = await UserModel.findByIdAndUpdate(
+            req.user.id,
+            newUserData,
+            {
+                new: true,
+                runValidators: true,
+                useFindAndModify: false,
+            }
+        )
+
+        res.status(200).json({
+            success: true,
+            user,
+        })
+    } catch (err) {
+        if (err instanceof Error) {
+            res.status(500).json({ success: false, message: err.message })
             return
         }
-        // const imageId = user.avatar.public_id
-
-        // await cloudinary.v2.uploader.destroy(imageId)
-
-        // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-        //     folder: 'avatars',
-        //     width: 150,
-        //     crop: 'scale',
-        // })
-
-        newUserData.avatar = {
-            public_id: 'myCloud.public_id',
-            url: 'myCloud.secure_url',
-        }
+        res.status(500).json({
+            success: false,
+            message: 'Something went wrong',
+        })
     }
+}
 
-    const user = await UserModel.findByIdAndUpdate(req.user.id, newUserData, {
-        new: true,
-        runValidators: true,
-        useFindAndModify: false,
-    })
+// Get all users(admin)
+export const getAllUser = async (
+    req: RequestUserType,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const users = await UserModel.find()
 
-    res.status(200).json({
-        success: true,
-        user,
-    })
+        res.status(200).json({
+            success: true,
+            users,
+        })
+    } catch (err) {
+        if (err instanceof Error) {
+            res.status(500).json({ success: false, message: err.message })
+            return
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Something went wrong',
+        })
+    }
+}
+
+// Get single user (admin)
+export const getSingleUser = async (
+    req: RequestUserType,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    if (req.params.id === null || req.params.id === undefined) {
+        next(new ErrorHandler(`Invalid request`, 500))
+        return
+    }
+    try {
+        const user = await UserModel.findById(req.params.id)
+
+        if (user === null) {
+            next(
+                new ErrorHandler(
+                    `User does not exist with Id: ${req.params.id}`,
+                    500
+                )
+            )
+            return
+        }
+
+        res.status(200).json({
+            success: true,
+            user,
+        })
+    } catch (err) {
+        if (err instanceof Error) {
+            res.status(500).json({ success: false, message: err.message })
+            return
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Something went wrong',
+        })
+    }
 }
