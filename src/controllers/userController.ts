@@ -317,7 +317,7 @@ export const getSingleUser = async (
     next: NextFunction
 ): Promise<void> => {
     if (req.params.id === null || req.params.id === undefined) {
-        next(new ErrorHandler(`No user`, 500))
+        next(new ErrorHandler(`Invalid request`, 500))
         return
     }
     try {
