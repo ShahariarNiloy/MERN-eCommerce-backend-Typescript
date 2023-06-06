@@ -4,6 +4,7 @@ import fileUpload from 'express-fileupload'
 import ErrorFunc from './middlewares/error'
 
 import order from './routes/orderRoutes'
+import payment from './routes/paymentRoutes'
 import product from './routes/productRoute'
 import user from './routes/userRoutes'
 
@@ -16,6 +17,7 @@ app.use(fileUpload())
 app.use('/api/v1', product)
 app.use('/api/v1', user)
 app.use('/api/v1', order)
+app.use('/api/v1', payment)
 
 app.use(ErrorFunc)
 

@@ -1,11 +1,14 @@
+import cloudinary from 'cloudinary'
 import type { NextFunction, Request, Response } from 'express'
 import type { Document } from 'mongoose'
+
 import { Types } from 'mongoose'
 import type { UserMethodsType, UserType } from '../model/UserModel/types'
 import UserModel from '../model/UserModel/userModel'
 import ErrorHandler from '../utils/errorHandler'
 import SendToken from '../utils/sendToken'
-// import { RequestUserType } from './type'
+
+// import { RequestUserType } from './type'const cloudinary = require("cloudinary");
 
 interface RequestUserType extends Request {
     user?:
@@ -115,24 +118,34 @@ export const deleteUser = async (
         next(new ErrorHandler('Invalid Request', 400))
         return
     }
+    try {
+        const user = await UserModel.findById(id)
 
-    const user = await UserModel.findById(id)
+        if (user === null) {
+            next(new ErrorHandler(`User does not exist with Id: ${id}`, 400))
+            return
+        }
 
-    if (user === null) {
-        next(new ErrorHandler(`User does not exist with Id: ${id}`, 400))
-        return
+        const imageId = user.avatar.public_id
+
+        await cloudinary.v2.uploader.destroy(imageId)
+
+        await user.remove()
+
+        res.status(200).json({
+            success: true,
+            message: 'User Deleted Successfully',
+        })
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            res.status(500).json({ success: false, message: err.message })
+        } else {
+            res.status(500).json({
+                success: false,
+                message: 'Something went wrong',
+            })
+        }
     }
-
-    // const imageId = user.avatar.public_id
-
-    // await cloudinary.v2.uploader.destroy(imageId)
-
-    await user.remove()
-
-    res.status(200).json({
-        success: true,
-        message: 'User Deleted Successfully',
-    })
 }
 
 export const getUserDetails = async (
@@ -243,19 +256,22 @@ export const updateProfile = async (
                 next(new ErrorHandler('User not found.', 400))
                 return
             }
-            // const imageId = user.avatar.public_id
+            const imageId = user.avatar.public_id
 
-            // await cloudinary.v2.uploader.destroy(imageId)
+            await cloudinary.v2.uploader.destroy(imageId)
 
-            // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-            //     folder: 'avatars',
-            //     width: 150,
-            //     crop: 'scale',
-            // })
+            const myCloud = await cloudinary.v2.uploader.upload(
+                req.body.avatar,
+                {
+                    folder: 'avatars',
+                    width: 150,
+                    crop: 'scale',
+                }
+            )
 
             newUserData.avatar = {
-                public_id: 'myCloud.public_id',
-                url: 'myCloud.secure_url',
+                public_id: myCloud.public_id,
+                url: myCloud.secure_url,
             }
         }
 

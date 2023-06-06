@@ -20,13 +20,14 @@
     "dependencies": {
         "@types/express-fileupload": "^1.4.1",
         "bcryptjs": "^2.4.3",
-        "cloudinary": "^1.33.0",
+        "cloudinary": "^1.37.0",
         "dotenv": "^16.0.3",
         "express": "^4.18.2",
         "express-fileupload": "^1.4.0",
         "jsonwebtoken": "^9.0.0",
         "mongoose": "^6.9.0",
         "nodemailer": "^6.9.1",
+        "stripe": "^12.8.0",
         "ts-node": "^10.9.1",
         "validator": "^13.7.0"
     },

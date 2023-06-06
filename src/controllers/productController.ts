@@ -1,9 +1,11 @@
+import cloudinary from 'cloudinary'
 import type { NextFunction, Request, Response } from 'express'
 import type { Document, ObjectId, Types } from 'mongoose'
 import Product from '../model/ProductModel/productModel'
 import type { UserMethodsType, UserType } from '../model/UserModel/types'
 import ApiFeatures from '../utils/apiFeatures'
 import ErrorHandler from '../utils/errorHandler'
+
 // import type { RequestUserType } from './type'
 
 interface RequestUserType extends Request {
@@ -26,6 +28,29 @@ export const createProductAdmin = async (
             req.body !== undefined &&
             req.body !== null
         ) {
+            let images = []
+
+            if (typeof req.body.images === 'string') {
+                images.push(req.body.images)
+            } else {
+                images = req.body.images
+            }
+
+            const imagesLinks = []
+
+            for (let i = 0; i < images.length; i++) {
+                const result = await cloudinary.v2.uploader.upload(images[i], {
+                    folder: 'products',
+                })
+
+                imagesLinks.push({
+                    public_id: result.public_id,
+                    url: result.secure_url,
+                })
+            }
+
+            req.body.images = imagesLinks
+
             req.body.user = req.user.id
         }
         const product = await Product.create(req.body)
@@ -131,7 +156,27 @@ export const updateProductAdmin = async (
         }
 
         if (images !== undefined) {
-            // req.body.images = imagesLinks;
+            // Deleting Images From Cloudinary
+            for (let i = 0; i < product.images.length; i++) {
+                await cloudinary.v2.uploader.destroy(
+                    product.images[i].public_id
+                )
+            }
+
+            const imagesLinks = []
+
+            for (let i = 0; i < images.length; i++) {
+                const result = await cloudinary.v2.uploader.upload(images[i], {
+                    folder: 'products',
+                })
+
+                imagesLinks.push({
+                    public_id: result.public_id,
+                    url: result.secure_url,
+                })
+            }
+
+            req.body.images = imagesLinks
         }
 
         product = await Product.findByIdAndUpdate(req.params.id, req.body, {
@@ -167,6 +212,10 @@ export const deleteProductAdmin = async (
         if (product === null) {
             next(new ErrorHandler('Product not found', 404))
             return
+        }
+        // Deleting Images From Cloudinary
+        for (let i = 0; i < product.images.length; i++) {
+            await cloudinary.v2.uploader.destroy(product.images[i].public_id)
         }
         await product.remove()
 

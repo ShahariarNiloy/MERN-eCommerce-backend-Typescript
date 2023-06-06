@@ -1,4 +1,6 @@
+import cloudinary from 'cloudinary'
 import * as crypto from 'crypto'
+
 import type { NextFunction, Request, Response } from 'express'
 import UserModel from '../model/UserModel/userModel'
 import ErrorHandler from '../utils/errorHandler'
@@ -11,6 +13,11 @@ export const registerUser = async (
     next: NextFunction
 ): Promise<void> => {
     const { name, email, password } = req.body
+    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+        folder: 'avatars',
+        width: 150,
+        crop: 'scale',
+    })
 
     if (Boolean(name) && Boolean(email) && Boolean(password)) {
         try {
@@ -19,8 +26,8 @@ export const registerUser = async (
                 email,
                 password,
                 avatar: {
-                    public_id: 'myCloud.public_id',
-                    url: ' myCloud.secure_url',
+                    public_id: myCloud.public_id,
+                    url: myCloud.secure_url,
                 },
             })
             SendToken(user, 201, res)
