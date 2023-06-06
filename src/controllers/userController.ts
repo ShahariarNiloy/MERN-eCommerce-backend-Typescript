@@ -8,8 +8,6 @@ import UserModel from '../model/UserModel/userModel'
 import ErrorHandler from '../utils/errorHandler'
 import SendToken from '../utils/sendToken'
 
-// import { RequestUserType } from './type'const cloudinary = require("cloudinary");
-
 interface RequestUserType extends Request {
     user?:
         | (Document<unknown, any, UserType> &
