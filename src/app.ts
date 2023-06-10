@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser'
+import cors from 'cors'
 import express from 'express'
 import fileUpload from 'express-fileupload'
 import ErrorFunc from './middlewares/error'
@@ -10,6 +11,7 @@ import user from './routes/userRoutes'
 
 const app = express()
 
+app.use(cors())
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(fileUpload())
