@@ -13,8 +13,13 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(fileUpload())
+app.use(bodyParser.json({ limit: '10mb' }))
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }))
+app.use(
+    fileUpload({
+        limits: { fileSize: 10 * 1024 * 1024 }, // Set the maximum file size (10MB in this example)
+    })
+)
 
 app.use('/api/v1', product)
 app.use('/api/v1', user)

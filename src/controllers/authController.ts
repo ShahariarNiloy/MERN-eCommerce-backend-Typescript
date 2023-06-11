@@ -12,15 +12,15 @@ export const registerUser = async (
     res: Response,
     next: NextFunction
 ): Promise<void> => {
-    const { name, email, password } = req.body
-    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-        folder: 'avatars',
-        width: 150,
-        crop: 'scale',
-    })
+    const { name, email, password, avatar } = req.body
 
     if (Boolean(name) && Boolean(email) && Boolean(password)) {
         try {
+            const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+                folder: 'avatars',
+                width: 150,
+                crop: 'scale',
+            })
             const user = await UserModel.create({
                 name,
                 email,
@@ -38,7 +38,7 @@ export const registerUser = async (
             } else {
                 res.status(400).json({
                     success: false,
-                    message: 'Something went wrong',
+                    message: err,
                 })
             }
             return
